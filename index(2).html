@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI节能投资分析</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #1e1e1e;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.2);
+            color: #00ffc3;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(to right, #00ffb3, #00d4ff);
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #00d4ff;
+            font-size: 1.1rem;
+            width: 40%;
+            text-align: left;
+        }
+
+        input {
+            padding: 10px;
+            font-size: 1rem;
+            width: 55%;
+            border-radius: 5px;
+            border: none;
+            outline: none;
+            background-color: #252525;
+            color: #00ffc3;
+            box-shadow: 0 3px 10px rgba(0, 255, 255, 0.1);
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            color: #fff;
+            background-color: #00bfa5;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 3px 15px rgba(0, 255, 255, 0.3);
+            align-self: center;
+        }
+
+        button:hover {
+            background-color: #00a389;
+        }
+
+        #results {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        #results h2 {
+            color: #00ffb3;
+        }
+
+        #results p {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        span {
+            font-weight: bold;
+            color: #00ffb3;
+        }
+
+        /* 登录页面样式 */
+        .login-container {
+            max-width: 500px;
+            margin: 100px auto;
+            padding: 30px;
+            background-color: #1e1e1e;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.2);
+            text-align: center;
+        }
+
+        .login-container h2 {
+            margin-bottom: 20px;
+            font-size: 2rem;
+            color: #00ffc3;
+        }
+
+        .login-container input {
+            width: 80%;
+            margin-bottom: 20px;
+            padding: 10px;
+            font-size: 1rem;
+            background-color: #252525;
+            color: #00ffc3;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录页面 -->
+    <div class="login-container" id="loginContainer">
+        <h2>用户登录</h2>
+        <input type="text" id="username" placeholder="用户名">
+        <input type="password" id="password" placeholder="密码">
+        <button onclick="login()">登录</button>
+    </div>
+
+    <!-- 主页面内容 -->
+    <div class="container" id="mainContainer" style="display: none;">
+        <h1>AI节能投资分析</h1>
+		 <!-- 右上角帮助按钮 -->
+    <button id="helpButton" style="position: absolute; top: 20px; right: 20px; background: none; border: none; cursor: pointer;">
+		帮助
+    </button>
+
+    <!-- 说明弹框 -->
+    <div id="helpModal" style="display: none; position: fixed; top: 25%; left: 37.5%; width: 25%; background-color: #1e1e1e; color: #00ffc3; border-radius: 10px; padding: 20px; box-shadow: 0 3px 10px rgba(0, 255, 255, 0.3);">
+        <h2>帮助</h2>
+        <p>填报说明</p> 	
+		<p>1、同一项目，“ 项目周期/使用寿命（年）”数值保持不变，填“正整数”，单位为“年”。	示例：10</p>
+		<p>2、同一项目，“ 折现率（%）”数值保持不变，填“正百分数”。   	示例：5%</p>
+		<p>3、“ 投资成本（万元）”	根据不同项目进行调整，单位为“万元”。		示例：1600</p>
+		<p>4、“ 每年电费（万元）”	根据不同项目进行调整，单位为“万元”。	示例：1000</p>
+		<p>5、“ 预计节能率（%）”	根据不同项目进行调整，填“正百分数”。		示例：30%</p>
+        <button onclick="closeHelp()" style="background-color: #00bfa5; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">关闭</button>
+    </div>
+        <div class="form-container">
+            <div class="form-row">
+                <label for="projectDuration">项目周期/使用寿命 (年):</label>
+                <input type="number" id="projectDuration" placeholder="输入项目周期" min="1">
+            </div>
+            <div class="form-row">
+                <label for="discountRate">折现率 (%):</label>
+                <input type="number" id="discountRate" placeholder="输入折现率" min="0" max="100">
+            </div>
+            <div class="form-row">
+                <label for="investmentCost">投资成本 (万元):</label>
+                <input type="number" id="investmentCost" placeholder="输入投资成本" min="0">
+            </div>
+            <div class="form-row">
+                <label for="annualElectricityCost">每年电费 (万元):</label>
+                <input type="number" id="annualElectricityCost" placeholder="输入每年电费" min="0">
+            </div>
+            <div class="form-row">
+                <label for="energySavingsRate">预计节能率 (%):</label>
+                <input type="number" id="energySavingsRate" placeholder="输入预计节能率" min="0" max="100">
+            </div>
+            <button onclick="calculate()">计算</button>
+        </div>
+
+        <div id="results">
+            <h2>结果</h2>
+            <p>投资回收期 (PP): <span id="ppResult"></span> 年, 评级: <span id="ppRating"></span></p>
+            <p>净现值 (NPV): <span id="npvResult"></span> 万元, 评级: <span id="npvRating"></span></p>
+            <p>内部收益率 (IRR): <span id="irrResult"></span> %, 评级: <span id="irrRating"></span></p>
+            <p>投资回报率 (ROI): <span id="roiResult"></span> %, 评级: <span id="roiRating"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // 允许的账号
+        const validAccounts = [
+            { username: 'user1', password: 'BFE2222' },
+            { username: 'user2', password: 'TRW2222' },
+            { username: 'user3', password: 'VRF2222' },
+            { username: 'user4', password: 'WJH2222' },
+            { username: 'user5', password: 'ODS2222' },
+            { username: 'user6', password: 'WPD2222' },
+            { username: 'user7', password: 'WLD2222' },
+            { username: 'user8', password: 'PSL2222' },
+            { username: 'user9', password: 'NED2222' },
+            { username: 'user10', password: 'YXM2222' }
+        ];
+		
+			
+
+        // 登录函数
+        function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            const account = validAccounts.find(acc => acc.username === username && acc.password === password);
+
+            if (account) {
+				// 登录成功后保存用户名到 localStorage
+				localStorage.setItem("savedUsername", username);
+                document.getElementById("loginContainer").style.display = 'none';
+                document.getElementById("mainContainer").style.display = 'block';
+            } else {
+                alert("登录失败，用户名或密码错误");
+            }
+			
+        }
+		
+		// 帮助按钮点击事件
+			document.getElementById('helpButton').onclick = function() {
+				document.getElementById('helpModal').style.display = 'block';
+			};
+
+			// 关闭帮助弹框函数
+			function closeHelp() {
+				document.getElementById('helpModal').style.display = 'none';
+			}
+			
+		// 页面加载时，检查 localStorage 是否有保存的用户名
+				window.onload = function() {
+				const savedUsername = localStorage.getItem("savedUsername");
+				if (savedUsername) {
+					document.getElementById("username").value = savedUsername;
+				}
+				};
+		
+				
+
+        // 计算逻辑保持不变
+        function calculate() {
+            const projectDuration = parseFloat(document.getElementById("projectDuration").value);
+            const discountRate = parseFloat(document.getElementById("discountRate").value) / 100;
+            const investmentCost = parseFloat(document.getElementById("investmentCost").value) * 10000;
+            const annualElectricityCost = parseFloat(document.getElementById("annualElectricityCost").value) * 10000;
+            const energySavingsRate = parseFloat(document.getElementById("energySavingsRate").value) / 100;
+
+            if (isNaN(projectDuration) || isNaN(discountRate) || isNaN(investmentCost) || isNaN(annualElectricityCost) || isNaN(energySavingsRate)) {
+                alert("请输入所有必填项");
+                return;
+            }
+
+            const annualSavings = annualElectricityCost * energySavingsRate;
+
+            const ppResult = calculatePP(investmentCost, annualSavings);
+            const ppRating = ratePP(ppResult);
+
+            const npvResult = calculateNPV(investmentCost, annualSavings, projectDuration, discountRate);
+            const npvRating = rateNPV(npvResult, investmentCost);
+
+            const irrResult = calculateIRR(investmentCost, annualSavings, projectDuration);
+            const irrRating = rateIRR(irrResult);
+
+            const totalReturn = annualSavings * projectDuration;
+            const roiResult = calculateROI(investmentCost, totalReturn);
+            const roiRating = rateROI(roiResult);
+
+            document.getElementById("ppResult").innerText = ppResult.toFixed(2);
+            document.getElementById("ppRating").innerText = ppRating;
+
+            document.getElementById("npvResult").innerText = npvResult.toFixed(2);
+            document.getElementById("npvRating").innerText = npvRating;
+
+            document.getElementById("irrResult").innerText = (irrResult * 100).toFixed(2);
+            document.getElementById("irrRating").innerText = irrRating;
+
+            document.getElementById("roiResult").innerText = (roiResult * 100).toFixed(2);
+            document.getElementById("roiRating").innerText = roiRating;
+        }
+
+        function calculatePP(initialInvestment, annualSavings) {
+            if (annualSavings === 0) return Infinity;
+            return initialInvestment / annualSavings;
+        }
+
+        function calculateNPV(initialInvestment, annualSavings, projectDuration, discountRate) {
+            let npv = -initialInvestment;
+            for (let t = 1; t <= projectDuration; t++) {
+                npv += annualSavings / Math.pow(1 + discountRate, t);
+            }
+            return npv / 10000;
+        }
+
+        function calculateIRR(initialInvestment, annualSavings, projectDuration) {
+            const precision = 1e-6;
+            let lowerBound = 0;
+            let upperBound = 1;
+            let rate = (lowerBound + upperBound) / 2;
+            let npv = calculateNPV(initialInvestment, annualSavings, projectDuration, rate);
+
+            while (Math.abs(npv) > precision) {
+                if (npv > 0) lowerBound = rate;
+                else upperBound = rate;
+
+                rate = (lowerBound + upperBound) / 2;
+                npv = calculateNPV(initialInvestment, annualSavings, projectDuration, rate);
+            }
+            return rate;
+        }
+
+        function calculateROI(initialInvestment, totalReturn) {
+            return (totalReturn - initialInvestment) / initialInvestment;
+        }
+
+        function ratePP(pp) {
+            if (pp <= 2) return "极佳";
+            if (pp <= 3) return "优秀";
+            if (pp <= 5) return "良好";
+            if (pp <= 7) return "合格";
+            return "不合格";
+        }
+
+        function rateNPV(npv, initialInvestment) {
+            if (npv >= 2 * initialInvestment) return "极佳";
+            if (npv >= 1.5 * initialInvestment) return "优秀";
+            if (npv >= initialInvestment) return "良好";
+            if (npv > 0) return "合格";
+            return "不合格";
+        }
+
+        function rateIRR(irr) {
+            if (irr >= 0.20) return "极佳";
+            if (irr >= 0.15) return "优秀";
+            if (irr >= 0.10) return "良好";
+            if (irr > 0.05) return "合格";
+            return "不合格";
+        }
+
+        function rateROI(roi) {
+            if (roi >= 2) return "极佳";
+            if (roi >= 1.5) return "优秀";
+            if (roi >= 1) return "良好";
+            if (roi >= 0.5) return "合格";
+            return "不合格";
+        }
+    </script>
+</body>
+</html>
